@@ -32,6 +32,7 @@ class MCMainMenu extends MusicBeatState
 
     // bitmap shits
     var menuBG:FlxSprite;
+    var dsLogo:FlxSprite;
 
     // yellow shit
     var yellowShit:FlxText;
@@ -39,7 +40,7 @@ class MCMainMenu extends MusicBeatState
     // button shits
     var storymode:FlxButton;
     var freeplay:FlxButton;
-    // var credits:FlxButton;
+    var credits:FlxButton;
     var options:FlxButton;
     var quitgame:FlxButton;
 
@@ -90,6 +91,12 @@ class MCMainMenu extends MusicBeatState
             menu.scale.y = 0.6;}
         menu.animation.play('idle', true);
 
+        dsLogo = new FlxSprite(FlxG.width - 184, FlxG.height - 184);
+        dsLogo.loadGraphic(Paths.image('menu/discord logo'));
+        dsLogo.antialiasing = true;
+        dsLogo.scale.x = 0.5;
+        dsLogo.scale.y = 0.5;
+
         yellowShit = new FlxText(0, 0, 0, finalVar[0] + '\n' + finalVar[1]);
 		yellowShit.setFormat(Paths.font("minecraft.otf"), 32, FlxColor.YELLOW, CENTER);
         yellowShit.angle = -30;
@@ -115,14 +122,14 @@ class MCMainMenu extends MusicBeatState
         freeplay.screenCenter(X);
         freeplay.y += 286;
 
-        /*credits = new FlxButton(0, 60, "Credits", function()
+        credits = new FlxButton(0, 60, "Credits", function()
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             //FlxG.mouse.visible = false;
             MusicBeatState.switchState(new CreditsState());
         });
         credits.screenCenter(X);
-        credits.y += 282;*/
+        credits.y += 282;
 
         options = new FlxButton(0, 90, "Options", function()
         {
@@ -142,27 +149,35 @@ class MCMainMenu extends MusicBeatState
 
         menuBG.cameras = [bgCam];
         yellowShit.cameras = [bgCam];
+        dsLogo.cameras = [bgCam];
         
 		storymode.cameras = [camHUD];
         freeplay.cameras = [camHUD];
-        // credits.cameras = [camHUD];
+        credits.cameras = [camHUD];
         options.cameras = [camHUD];
         quitgame.cameras = [camHUD];
 
         // adds gay shit
         add(menuBG);
         add(menu);
+        add(dsLogo);
         add(yellowShit);
 
         add(storymode);
         add(freeplay);
-        // add(credits);
+        add(credits);
         add(options);
         add(quitgame);
 
         fuckBump(0);
 
         trace ('lmao');
+    }
+
+    override function update(elapsed:Float)
+    {
+        if (FlxG.mouse.overlaps(dsLogo) && FlxG.mouse.justPressed)
+            CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
     }
 
     public function getShit()
