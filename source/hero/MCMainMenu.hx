@@ -32,7 +32,7 @@ class MCMainMenu extends MusicBeatState
 
     // bitmap shits
     var menuBG:FlxSprite;
-    var dsLogo:FlxSprite;
+    // var dsLogo:FlxSprite;
 
     // yellow shit
     var yellowShit:FlxText;
@@ -41,6 +41,7 @@ class MCMainMenu extends MusicBeatState
     var storymode:FlxButton;
     var freeplay:FlxButton;
     var credits:FlxButton;
+    var dis:FlxButton;
     var options:FlxButton;
     var quitgame:FlxButton;
 
@@ -91,11 +92,11 @@ class MCMainMenu extends MusicBeatState
             menu.scale.y = 0.6;}
         menu.animation.play('idle', true);
 
-        dsLogo = new FlxSprite(FlxG.width - 184, FlxG.height - 184);
+        /*dsLogo = new FlxSprite(FlxG.width - 184, FlxG.height - 184);
         dsLogo.loadGraphic(Paths.image('menu/discord logo'));
         dsLogo.antialiasing = true;
         dsLogo.scale.x = 0.5;
-        dsLogo.scale.y = 0.5;
+        dsLogo.scale.y = 0.5;*/
 
         yellowShit = new FlxText(0, 0, 0, finalVar[0] + '\n' + finalVar[1]);
 		yellowShit.setFormat(Paths.font("minecraft.otf"), 32, FlxColor.YELLOW, CENTER);
@@ -113,59 +114,68 @@ class MCMainMenu extends MusicBeatState
         storymode.screenCenter(X);
         storymode.y += 290;
 
-        freeplay = new FlxButton(0, 30, "Freeplay", function()
+        freeplay = new FlxButton(0, 0, "Freeplay", function()
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             //FlxG.mouse.visible = false;
             MusicBeatState.switchState(new FreeplayState());
         });
         freeplay.screenCenter(X);
-        freeplay.y += 286;
+        freeplay.y += 315;
 
-        credits = new FlxButton(0, 60, "Credits", function()
+        credits = new FlxButton(0, 0, "Credits", function()
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             //FlxG.mouse.visible = false;
             MusicBeatState.switchState(new CreditsState());
         });
         credits.screenCenter(X);
-        credits.y += 282;
+        credits.y += 340;
 
-        options = new FlxButton(0, 90, "Options", function()
+        dis = new FlxButton(0, 0, "Discord server", function()
+        {
+            FlxG.sound.play(Paths.sound('minecraft_click'), 2);
+            CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
+        });
+        dis.screenCenter(X);
+        dis.y += 365;
+
+        options = new FlxButton(0, 0, "Options", function()
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             FlxG.mouse.visible = false;
             MusicBeatState.switchState(new OptionsState());
         });
         options.screenCenter(X);
-        options.y += 282;
+        options.y += 390;
 
-        quitgame = new FlxButton(0, 120, "Quit game", function()
+        quitgame = new FlxButton(10, 0, "Quit game", function()
         {
             System.exit(0);
         });
-        quitgame.screenCenter(X);
-        quitgame.y += 278;
+        quitgame.y += 410;
 
         menuBG.cameras = [bgCam];
         yellowShit.cameras = [bgCam];
-        dsLogo.cameras = [bgCam];
+        // dsLogo.cameras = [bgCam];
         
 		storymode.cameras = [camHUD];
         freeplay.cameras = [camHUD];
         credits.cameras = [camHUD];
+        dis.cameras = [camHUD];
         options.cameras = [camHUD];
         quitgame.cameras = [camHUD];
 
         // adds gay shit
         add(menuBG);
         add(menu);
-        add(dsLogo);
+        // add(dsLogo);
         add(yellowShit);
 
         add(storymode);
         add(freeplay);
         add(credits);
+        add(dis);
         add(options);
         add(quitgame);
 
@@ -174,11 +184,11 @@ class MCMainMenu extends MusicBeatState
         trace ('lmao');
     }
 
-    override function update(elapsed:Float)
+    /*override function update(elapsed:Float)
     {
         if (FlxG.mouse.overlaps(dsLogo) && FlxG.mouse.justPressed)
             CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
-    }
+    }*/
 
     public function getShit()
     {

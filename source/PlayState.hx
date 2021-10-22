@@ -1,5 +1,6 @@
 package;
 
+import hero.BattleEvents;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -50,6 +51,7 @@ import StageData;
 import FunkinLua;
 import DialogueBoxPsych;
 import flash.system.System;
+import hero.BattleEvents as Warning;
 
 #if sys
 import sys.FileSystem;
@@ -59,6 +61,11 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	var canDodge:Bool = true;
+	var canBeHit:Bool = true;
+	var fightMech:Warning;
+	//var lightning:FlxSprite;
+
 	var doRGB:Bool = false;
 
 	var canDrain:Bool = false;
@@ -325,8 +332,6 @@ class PlayState extends MusicBeatState
 		if(PlayState.SONG.stage == null || PlayState.SONG.stage.length < 1) {
 			switch (songName)
 			{
-				case 'spookeez' | 'south' | 'monster':
-					curStage = 'spooky';
 				case 'pico' | 'blammed' | 'philly' | 'philly-nice':
 					curStage = 'philly';
 				case 'milf' | 'satin-panties' | 'high':
@@ -386,6 +391,18 @@ class PlayState extends MusicBeatState
 				woods.screenCenter();
 				add(woods);
 
+				/*lightning = new FlxSprite(0, 0);
+				lightning.frames = Paths.getSparrowAtlas('woods/lightning');
+				lightning.animation.addByPrefix('idle', 'null', 1);
+				lightning.animation.addByPrefix('hit', 'strike', 24);
+				lightning.animation.play('idle');
+				lightning.screenCenter();
+				lightning.updateHitbox();*/
+
+				fightMech = new BattleEvents();
+				fightMech.cameras = [camHUD];
+				add(fightMech);
+
 			case 'stage': //Week 1
 				var bg:BGSprite = new BGSprite('stageback', -600, -200, 0.9, 0.9);
 				add(bg);
@@ -411,23 +428,6 @@ class PlayState extends MusicBeatState
 					stageCurtains.updateHitbox();
 					add(stageCurtains);
 				}
-
-			case 'spooky': //Week 2
-				if(!ClientPrefs.lowQuality) {
-					halloweenBG = new BGSprite('halloween_bg', -200, -100, ['halloweem bg0', 'halloweem bg lightning strike']);
-				} else {
-					halloweenBG = new BGSprite('halloween_bg_low', -200, -100);
-				}
-				add(halloweenBG);
-
-				halloweenWhite = new BGSprite(null, -FlxG.width, -FlxG.height, 0, 0);
-				halloweenWhite.makeGraphic(Std.int(FlxG.width * 3), Std.int(FlxG.height * 3), FlxColor.WHITE);
-				halloweenWhite.alpha = 0;
-				halloweenWhite.blend = ADD;
-
-				//PRECACHE SOUNDS
-				CoolUtil.precacheSound('thunder_1');
-				CoolUtil.precacheSound('thunder_2');
 
 			case 'philly': //Week 3
 				if(!ClientPrefs.lowQuality) {
@@ -666,14 +666,14 @@ class PlayState extends MusicBeatState
 		add(gfGroup);
 
 		// Shitty layering but whatev it works LOL
-		if (curStage == 'limo')
-			add(limo);
 
 		add(dadGroup);
 		add(boyfriendGroup);
 
-		if(curStage == 'spooky') {
-			add(halloweenWhite);
+		if (curStage == 'woods')
+		{
+			// lightning.x = boyfriend.getGraphicMidpoint().x;
+			// add(lightning);
 		}
 
 		#if LUA_ALLOWED
@@ -1851,10 +1851,28 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
+		heroLightning();
+
 		if (ClientPrefs.middleScroll && health >= 0.01)
 			health = 0.01;
 
 		callOnLuas('onUpdate', [elapsed]);
+
+		if (FlxG.keys.justPressed.SPACE && canDodge && !cpuControlled)
+		{
+			canDodge = false;
+			canBeHit = false;
+			boyfriend.playAnim('dodge');
+			boyfriend.specialAnim = true;
+			new FlxTimer().start(0.35, function(timer:FlxTimer) // dodge cooldown
+			{
+				canBeHit = true;
+			});
+			new FlxTimer().start(0.95, function(timer:FlxTimer) // dodge cooldown
+			{
+				canDodge = true;
+			});
+		}
 
 		switch (curStage)
 		{
@@ -2810,6 +2828,20 @@ class PlayState extends MusicBeatState
 				}
 				else
 					doRGB = false;
+
+			case 'New Warning':
+				var val:Int = Std.parseInt(value1) - 1;
+				if (storyDifficulty == 1 && val <= 3)
+					fightMech.callNew(val);
+				else
+					fightMech.callNew(val);
+
+				FlxTween.tween(fightMech, {alpha: 0}, 0.15);
+				if (cpuControlled && val == 5)
+				{
+					boyfriend.playAnim('dodge');
+					boyfriend.specialAnim = true;
+				}
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
@@ -3689,38 +3721,6 @@ class PlayState extends MusicBeatState
 		startedMoving = false;
 	}
 
-	function lightningStrikeShit():Void
-	{
-		FlxG.sound.play(Paths.soundRandom('thunder_', 1, 2));
-		if(!ClientPrefs.lowQuality) halloweenBG.animation.play('halloweem bg lightning strike');
-
-		lightningStrikeBeat = curBeat;
-		lightningOffset = FlxG.random.int(8, 24);
-
-		if(boyfriend.animOffsets.exists('scared')) {
-			boyfriend.playAnim('scared', true);
-		}
-		if(gf.animOffsets.exists('scared')) {
-			gf.playAnim('scared', true);
-		}
-
-		if(ClientPrefs.camZooms) {
-			FlxG.camera.zoom += 0.015;
-			camHUD.zoom += 0.03;
-
-			if(!camZooming) { //Just a way for preventing it to be permanently zoomed until Skid & Pump hits a note
-				FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 0.5);
-				FlxTween.tween(camHUD, {zoom: 1}, 0.5);
-			}
-		}
-
-		if(ClientPrefs.flashing) {
-			halloweenWhite.alpha = 0.4;
-			FlxTween.tween(halloweenWhite, {alpha: 0.5}, 0.075);
-			FlxTween.tween(halloweenWhite, {alpha: 0}, 0.25, {startDelay: 0.15});
-		}
-	}
-
 	function killHenchmen():Void
 	{
 		if(!ClientPrefs.lowQuality && ClientPrefs.violence && curStage == 'limo') {
@@ -3802,9 +3802,6 @@ class PlayState extends MusicBeatState
 		setOnLuas('curStep', curStep);
 		callOnLuas('onStepHit', []);
 	}
-
-	var lightningStrikeBeat:Int = 0;
-	var lightningOffset:Int = 8;
 
 	var lastBeatHit:Int = -1;
 	override function beatHit()
@@ -3963,10 +3960,6 @@ class PlayState extends MusicBeatState
 				}
 		}
 
-		if (curStage == 'spooky' && FlxG.random.bool(10) && curBeat > lightningStrikeBeat + lightningOffset)
-		{
-			lightningStrikeShit();
-		}
 		lastBeatHit = curBeat;
 
 		setOnLuas('curBeat', curBeat);
@@ -4129,6 +4122,22 @@ class PlayState extends MusicBeatState
 			sky.scale.y = 1.5 + (0.1 * modifier);
 			FlxTween.tween(sky.scale, {y: 1.5, x: 1.5}, 0.1);
 		}
+	}
+
+	public static function callLightning()
+	{
+		FlxG.sound.play(Paths.sound('thunder'), 14);
+		// lightning.animation.play('hit');
+	}
+
+	public function heroLightning()
+	{
+		/*if (lightning.animation.curAnim.curFrame == 2)
+				if (canBeHit && !cpuControlled)
+				{
+					health -= 1;
+					boyfriend.playAnim('hurt');
+				}*/
 	}
 
 	var curLight:Int = 0;
