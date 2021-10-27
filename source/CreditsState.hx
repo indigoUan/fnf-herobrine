@@ -25,15 +25,21 @@ class CreditsState extends MusicBeatState
 
 	private static var creditsStuff:Array<Dynamic> = [ //Name - Icon name - Description - Link - BG Color
 		['Untitled Funkers'],
-		["MrFlamin'",			'flamin',			'Director',					'https://www.youtube.com/channel/UC5z6qGZzkifFXFoA8Gqq1wA', 	0xFFF21811],
-		['indigo',				'uan',				'faggot programmer',								'https://twitter.com/indigoUan',        0xFF4B0082],
 		['SmokeCannon',			'smoke',			'Musician',											'https://youtu.be/dQw4w9WgXcQ',			0xFFFFFFFF],
+		['Slimemoreno17',		'slime',			'Musician',											'',										0xFFFF0094],
+		['Z11Gaming',			'z',				'Musician',											'',										0xFFFF0094],
+		['indigo',				'uan',				'Programmer',										'https://twitter.com/indigoUan',        0xFF4B0082],
+		['Dylan',				'dylan',			'Artist',											'https://twitter.com/Select3222',		0xFFFF0094],
 		['Select',				'select',			'Artist',											'https://twitter.com/Select3222',		0xFFFF0094],
 		['TiagoFuzionPoco',		'tiago',			'Artist',											'https://twitter.com/Select3222',		0xFFFF0094],
-		['Select',				'select',			'Artist',											'https://twitter.com/Select3222',		0xFFFF0094],
+		['OJogadorAnimador',	'tiago',			'Animator',											'https://twitter.com/Select3222',		0xFFFF0094],
+		["MrFlamin'",			'flamin',			'Ideas and suggestions',	'https://www.youtube.com/channel/UC5z6qGZzkifFXFoA8Gqq1wA', 	0xFFF21811],
+		["CanonDev",			'flamin',			'Ideas and suggestions',	'https://www.youtube.com/channel/UC5z6qGZzkifFXFoA8Gqq1wA', 	0xFFF21811],
+		["MagiciansWRLD",		'flamin',			'Ideas and suggestions',	'https://www.youtube.com/channel/UC5z6qGZzkifFXFoA8Gqq1wA', 	0xFFF21811],
 		[''],
 		['Special Thanks'],
-		['Cape',				'blank',		'Charter',											'https://gamebanana.com/members/1919621',	0xFFAAAAFF],
+		['Cape',				'blank',		'Charter',											'https://twitter.com/TheMaskedChris',		0xFFAAAAFF],
+		['TheMaskedChris',		'blank',		'Original Herobrine Sketch',						'https://gamebanana.com/members/1919621',	0xFF8888FF],
 		[''],
 		['Psych Engine Team'],
 		['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',					'https://twitter.com/Shadow_Mario_',	0xFFFFDD33],
@@ -87,7 +93,11 @@ class CreditsState extends MusicBeatState
 			grpOptions.add(optionText);
 
 			if(isSelectable) {
-				var icon:AttachedSprite = new AttachedSprite('credits/' + creditsStuff[i][1]);
+				var icon:AttachedSprite;
+				if(Assets.exists(Paths.image('credits/' + creditsStuff[i][1])))
+					icon = new AttachedSprite('credits/' + creditsStuff[i][1]);
+				else
+					icon = new AttachedSprite('credits/blank');
 				icon.xAdd = optionText.width + 10;
 				icon.sprTracker = optionText;
 	
@@ -136,9 +146,9 @@ class CreditsState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			MusicBeatState.switchState(new MainMenuState());
 		}
-		if(controls.ACCEPT) {
+		/*if(controls.ACCEPT) {
 			CoolUtil.browserLoad(creditsStuff[curSelected][3]);
-		}
+		}*/
 		super.update(elapsed);
 	}
 

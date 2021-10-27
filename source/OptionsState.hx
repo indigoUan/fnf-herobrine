@@ -721,6 +721,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 		'Framerate', //Apparently 120FPS isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
 		#end
 		'GAMEPLAY',
+		'Health Drain',
 		'Downscroll',
 		//'Middlescroll',
 		'Ghost Tapping',
@@ -902,6 +903,9 @@ class PreferencesSubstate extends MusicBeatSubstate
 					/*case 'Middlescroll':
 						ClientPrefs.middleScroll = !ClientPrefs.middleScroll;*/
 
+					case 'Health Drain':
+						ClientPrefs.healthDrain = !ClientPrefs.healthDrain;
+
 					case 'Ghost Tapping':
 						ClientPrefs.ghostTapping = !ClientPrefs.ghostTapping;
 
@@ -994,6 +998,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 				daText = "If checked, notes go Down instead of Up, simple enough.";
 			/*case 'Middlescroll':
 				daText = "If checked, hides Opponent's notes and your notes get centered.";*/
+			case 'Health Drain':
+				daText = "If checked, the opponent will deal damage when\nthey hit a note correctly.";
 			case 'Ghost Tapping':
 				daText = "If checked, you won't get misses from pressing keys\nwhile there are no notes able to be hit.";
 			case 'Swearing':
@@ -1068,6 +1074,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 						daValue = ClientPrefs.downScroll;
 					/*case 'Middlescroll':
 						daValue = ClientPrefs.middleScroll;*/
+					case 'Health Drain':
+						daValue = ClientPrefs.healthDrain;
 					case 'Ghost Tapping':
 						daValue = ClientPrefs.ghostTapping;
 					case 'Swearing':

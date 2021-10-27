@@ -61,6 +61,7 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	var wasTroll:Bool = false;
 	var canDodge:Bool = true;
 	var canBeHit:Bool = true;
 	var fightMech:Warning;
@@ -70,7 +71,7 @@ class PlayState extends MusicBeatState
 
 	var canDrain:Bool = false;
 
-	var lastrgb:Int = 0;
+	var lastrgb:Int = -1;
 
 	public static var STRUM_X = 42;
 	public static var STRUM_X_MIDDLESCROLL = -278;
@@ -664,6 +665,9 @@ class PlayState extends MusicBeatState
 		}
 
 		add(gfGroup);
+
+		if(SONG.player2 == 'slender')
+			gf.visible = false;
 
 		// Shitty layering but whatev it works LOL
 
@@ -1853,6 +1857,11 @@ class PlayState extends MusicBeatState
 	{
 		heroLightning();
 
+		if(health >= 2)
+			health = 2;
+		if(health <= 0)
+			health = 0;
+
 		if (ClientPrefs.middleScroll && health >= 0.01)
 			health = 0.01;
 
@@ -2052,6 +2061,23 @@ class PlayState extends MusicBeatState
 				#if desktop
 				DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
 				#end
+			}
+		}
+
+		if (wasTroll)
+		{
+			var ret:Dynamic = callOnLuas('onPause', []);
+			if(ret != FunkinLua.Function_Stop) {
+				persistentUpdate = false;
+				persistentDraw = true;
+				paused = true;
+
+				if(FlxG.sound.music != null) {
+					FlxG.sound.music.pause();
+					vocals.pause();
+				}
+				PauseSubState.transCamera = camOther;
+				openSubState(new TrollSubState());
 			}
 		}
 
@@ -2320,7 +2346,7 @@ class PlayState extends MusicBeatState
 						} else {
 							dad.playAnim(animToPlay + altAnim, true);
 							dad.holdTimer = 0;
-							if (health >= 0.021 && canDrain)
+							if (health >= 0.021 && canDrain && ClientPrefs.healthDrain)
 								health -= 0.02;
 						}
 					}
@@ -2438,11 +2464,8 @@ class PlayState extends MusicBeatState
 
 	var isDead:Bool = false;
 	function doDeathCheck() {
-		if (health <= 0 && !practiceMode && !isDead)
+		if (health <= 0 && !practiceMode && !isDead && !wasTroll && storyDifficulty == 0)
 		{
-			if (ClientPrefs.middleScroll == true)
-				System.exit(0);
-
 			var ret:Dynamic = callOnLuas('onGameOver', []);
 			if(ret != FunkinLua.Function_Stop) {
 				boyfriend.stunned = true;
@@ -2473,6 +2496,9 @@ class PlayState extends MusicBeatState
 				return true;
 			}
 		}
+		else if (health <= 0 && !practiceMode && !isDead && !wasTroll && storyDifficulty == 1)
+			System.exit(0);
+
 		return false;
 	}
 
@@ -2830,17 +2856,20 @@ class PlayState extends MusicBeatState
 					doRGB = false;
 
 			case 'New Warning':
-				var val:Int = Std.parseInt(value1) - 1;
-				if (storyDifficulty == 1 && val <= 3)
-					fightMech.callNew(val);
-				else
-					fightMech.callNew(val);
-
-				FlxTween.tween(fightMech, {alpha: 0}, 0.15);
-				if (cpuControlled && val == 5)
+				if (Global.unlocked == true)
 				{
-					boyfriend.playAnim('dodge');
-					boyfriend.specialAnim = true;
+					var val:Int = Std.parseInt(value1) - 1;
+					if (storyDifficulty == 1 && val <= 3)
+						fightMech.callNew(val);
+					else
+						fightMech.callNew(val);
+
+					FlxTween.tween(fightMech, {alpha: 0}, 0.15);
+					if (cpuControlled && val == 5)
+					{
+						boyfriend.playAnim('dodge');
+						boyfriend.specialAnim = true;
+					}
 				}
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
@@ -3453,6 +3482,9 @@ class PlayState extends MusicBeatState
 
 			boyfriend.playAnim(animToPlay + daAlt, true);
 		}
+		if(daNote.noteType == 'troll')
+			wasTroll = true;
+
 		callOnLuas('noteMiss', [notes.members.indexOf(daNote), daNote.noteData, daNote.noteType, daNote.isSustainNote]);
 	}
 
@@ -3813,39 +3845,27 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		if (doRGB)
-			{
-				FlxG.camera.zoom += 0.06;
-				camHUD.zoom += 0.04;
-				skyBeat(1.5);
-				var shit = FlxG.random.int(1, 3);
-				if (shit == lastrgb)
-					shit = lastrgb + 1;
-				if (shit == 4)
-					shit = 1;
-				switch (shit)
-				{
-					case 1:
-						sky.color = FlxColor.fromRGB(255, 0, 0);
-						woods.color = FlxColor.fromRGB(255, 100, 100);
-						dad.color = FlxColor.fromRGB(255, 100, 100);
-						boyfriend.color = FlxColor.fromRGB(255, 100, 100);
-						gf.color = FlxColor.fromRGB(255, 100, 100);
-					case 2:
-						sky.color = FlxColor.fromRGB(0, 255, 0);
-						woods.color = FlxColor.fromRGB(100, 255, 100);
-						dad.color = FlxColor.fromRGB(100, 255, 100);
-						gf.color = FlxColor.fromRGB(100, 255, 100);
-						boyfriend.color = FlxColor.fromRGB(100, 255, 100);
-					case 3:
-						sky.color = FlxColor.fromRGB(0, 0, 255);
-						woods.color = FlxColor.fromRGB(100, 100, 255);
-						dad.color = FlxColor.fromRGB(100, 100, 255);
-						gf.color = FlxColor.fromRGB(100, 100, 255);
-						boyfriend.color = FlxColor.fromRGB(100, 100, 255);
-				}
-				lastrgb = shit;
-			}
+		if(SONG.song.toLowerCase() == 'danger')
+			camGame.shake(0.004, 0.2);
+
+		if(doRGB) // new gayia
+		{
+			FlxG.camera.zoom += 0.06;
+			camHUD.zoom += 0.04;
+			skyBeat(1.5);
+			var shit:Int = lastrgb;
+			shit++;
+			if (shit >= Global.gay.length)
+				shit = 0;
+
+			sky.color = FlxColor.fromRGB(Global.gay[shit][0], Global.gay[shit][1], Global.gay[shit][2]);
+			woods.color = FlxColor.fromRGB(Global.gay[shit][0] + 100, Global.gay[shit][1] + 100, Global.gay[shit][2] + 100);
+			dad.color = FlxColor.fromRGB(Global.gay[shit][0] + 100, Global.gay[shit][1] + 100, Global.gay[shit][2] + 100);
+			boyfriend.color = FlxColor.fromRGB(Global.gay[shit][0] + 45, Global.gay[shit][1] + 45, Global.gay[shit][2] + 45);
+			gf.color = FlxColor.fromRGB(Global.gay[shit][0] + 45, Global.gay[shit][1] + 45, Global.gay[shit][2] + 45);
+
+			lastrgb = shit;
+		}
 		else
 		{
 			skyBeat(0.5);
@@ -3855,6 +3875,38 @@ class PlayState extends MusicBeatState
 			gf.color = FlxColor.fromRGB(200, 200, 200);
 			boyfriend.color = FlxColor.fromRGB(200, 200, 200);
 		}
+
+		// old gayia
+		/*FlxG.camera.zoom += 0.06;
+		camHUD.zoom += 0.04;
+		skyBeat(1.5);
+		var shit = FlxG.random.int(1, 3);
+		if (shit == lastrgb)
+			shit = lastrgb + 1;
+		if (shit == 4)
+			shit = 1;
+		switch (shit)
+		{
+			case 1:
+				sky.color = FlxColor.fromRGB(255, 0, 0);
+				woods.color = FlxColor.fromRGB(255, 100, 100);
+				dad.color = FlxColor.fromRGB(255, 100, 100);
+				boyfriend.color = FlxColor.fromRGB(255, 100, 100);
+				gf.color = FlxColor.fromRGB(255, 100, 100);
+			case 2:
+				sky.color = FlxColor.fromRGB(0, 255, 0);
+				woods.color = FlxColor.fromRGB(100, 255, 100);
+				dad.color = FlxColor.fromRGB(100, 255, 100);
+				gf.color = FlxColor.fromRGB(100, 255, 100);
+				boyfriend.color = FlxColor.fromRGB(100, 255, 100);
+			case 3:
+				sky.color = FlxColor.fromRGB(0, 0, 255);
+				woods.color = FlxColor.fromRGB(100, 100, 255);
+				dad.color = FlxColor.fromRGB(100, 100, 255);
+				gf.color = FlxColor.fromRGB(100, 100, 255);
+				boyfriend.color = FlxColor.fromRGB(100, 100, 255);
+		}
+		lastrgb = shit;*/
 
 		if (generatedMusic)
 		{
