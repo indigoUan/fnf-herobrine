@@ -20,7 +20,6 @@ import flixel.util.FlxColor;
 import lime.app.Application;
 import openfl.Assets;
 import flash.system.System;
-//using System;
 
 class MCMainMenu extends MusicBeatState
 {
@@ -32,7 +31,6 @@ class MCMainMenu extends MusicBeatState
 
     // bitmap shits
     var menuBG:FlxSprite;
-    // var dsLogo:FlxSprite;
 
     // yellow shit
     var yellowShit:FlxText;
@@ -41,7 +39,7 @@ class MCMainMenu extends MusicBeatState
     var storymode:FlxButton;
     var freeplay:FlxButton;
     var credits:FlxButton;
-    var dis:FlxButton;
+    var soc:FlxButton;
     var options:FlxButton;
     var quitgame:FlxButton;
 
@@ -92,12 +90,6 @@ class MCMainMenu extends MusicBeatState
             menu.scale.y = 0.6;}
         menu.animation.play('idle', true);
 
-        /*dsLogo = new FlxSprite(FlxG.width - 184, FlxG.height - 184);
-        dsLogo.loadGraphic(Paths.image('menu/discord logo'));
-        dsLogo.antialiasing = true;
-        dsLogo.scale.x = 0.5;
-        dsLogo.scale.y = 0.5;*/
-
         yellowShit = new FlxText(0, 0, 0, finalVar[0] + '\n' + finalVar[1]);
 		yellowShit.setFormat(Paths.font("minecraft.otf"), 32, FlxColor.YELLOW, CENTER);
         yellowShit.angle = -30;
@@ -132,13 +124,15 @@ class MCMainMenu extends MusicBeatState
         credits.screenCenter(X);
         credits.y += 340;
 
-        dis = new FlxButton(0, 0, "Discord server", function()
+        soc = new FlxButton(0, 0, "Our Socials!", function() // I SEE YOU, KBH GAMES, I HAVE THE BALLS TO REPORT YOU, DON'T TEST ME 
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
+            CoolUtil.browserLoad('https://www.youtube.com/channel/UCFEwoWiZkeRkxTxDA9KeOFQ');
+            CoolUtil.browserLoad('https://twitter.com/UntitledFunkers');
         });
-        dis.screenCenter(X);
-        dis.y += 365;
+        soc.screenCenter(X);
+        soc.y += 365;
 
         options = new FlxButton(0, 0, "Options", function()
         {
@@ -157,25 +151,23 @@ class MCMainMenu extends MusicBeatState
 
         menuBG.cameras = [bgCam];
         yellowShit.cameras = [bgCam];
-        // dsLogo.cameras = [bgCam];
         
 		storymode.cameras = [camHUD];
         freeplay.cameras = [camHUD];
         credits.cameras = [camHUD];
-        dis.cameras = [camHUD];
+        soc.cameras = [camHUD];
         options.cameras = [camHUD];
         quitgame.cameras = [camHUD];
 
         // adds gay shit
         add(menuBG);
         add(menu);
-        // add(dsLogo);
         add(yellowShit);
 
         add(storymode);
         add(freeplay);
         add(credits);
-        add(dis);
+        add(soc);
         add(options);
         add(quitgame);
 
@@ -183,12 +175,6 @@ class MCMainMenu extends MusicBeatState
 
         trace ('lmao');
     }
-
-    /*override function update(elapsed:Float)
-    {
-        if (FlxG.mouse.overlaps(dsLogo) && FlxG.mouse.justPressed)
-            CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
-    }*/
 
     public function getShit()
     {
