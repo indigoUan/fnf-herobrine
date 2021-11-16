@@ -39,6 +39,9 @@ class MCTitleScreen extends MusicBeatState
 
         Global.getFile();
 
+        Global.isRec = CoolUtil.isRecording();
+        Global.isBot = CoolUtil.isBot();
+
 		//MusicBeatState.switchState(new editors.MasterEditorMenu());
     }
 }

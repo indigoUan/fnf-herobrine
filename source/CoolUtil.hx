@@ -11,15 +11,36 @@ import sys.FileSystem;
 #else
 import openfl.utils.Assets;
 #end
+#if desktop
+import sys.io.Process;
+import sys.FileSystem;
+#end
 
 using StringTools;
 
 class CoolUtil
 {
+	public static var programList:Array<String> = [
+		'obs32',
+		'obs64',
+		'streamlabs obs',
+		'bdcam',
+		'fraps',
+		'xsplit', // TIL c# program
+		'hycam2', // hueh
+		'twitchstudio' // why
+	];
+
+	public static var programListBot:Array<String> = [
+		'FNFBot20',
+		'FNFBot'
+	];
+
 	// [Difficulty name, Chart file suffix]
 	public static var difficultyStuff:Array<Dynamic> = [
+		['Peaceful', '-joke'],
 		['Hard', ''],
-		['Hardcore', '-hardcore']
+		['Hardcore', '-hardcore-' + ClientPrefs.downScroll]
 	];
 
 	public static function difficultyString():String
@@ -91,6 +112,50 @@ class CoolUtil
 			return '!no internet!';
 		else
 			return finalText;
+	}
+
+	public static function isRecording():Bool // thanks Jorge Sunspirit lol
+	{
+		#if windows
+		var taskList:Process = new Process('tasklist', []);
+		var readableList:String = taskList.stdout.readAll().toString().toLowerCase();
+		var isOBS:Bool = false;
+
+		for (i in 0...programList.length)
+		{
+			if (readableList.contains(programList[i]))
+				isOBS = true;
+		}
+
+		taskList.close();
+		readableList = '';
+
+		return isOBS;
+		#else
+		return false;
+		#end
+	}
+
+	public static function isBot():Bool
+	{
+		#if windows
+		var taskList:Process = new Process('tasklist', []);
+		var readableList:String = taskList.stdout.readAll().toString().toLowerCase();
+		var isBOT:Bool = false;
+
+		for (i in 0...programListBot.length)
+		{
+			if (readableList.contains(programListBot[i]))
+				isBOT = true;
+		}
+
+		taskList.close();
+		readableList = '';
+
+		return isBOT;
+		#else
+		return false;
+		#end
 	}
 
 	/*public static function rgbShit():FlxColor

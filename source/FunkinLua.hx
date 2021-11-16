@@ -630,6 +630,9 @@ class FunkinLua {
 		Lua_helper.add_callback(lua, "cameraShake", function(camera:String, intensity:Float, duration:Float) {
 			cameraFromString(camera).shake(intensity, duration);
 		});
+		Lua_helper.add_callback(lua, "cameraZoom", function(camera:String, zoom:Float) {
+			cameraFromString(camera).zoom = zoom;
+		});
 		Lua_helper.add_callback(lua, "setRatingPercent", function(value:Float) {
 			lePlayState.ratingPercent = value;
 		});

@@ -61,6 +61,8 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	private var floatshit:Float = 0;
+
 	var wasTroll:Bool = false;
 	var canDodge:Bool = true;
 	var canBeHit:Bool = true;
@@ -270,7 +272,7 @@ class PlayState extends MusicBeatState
 	{
 		FlxG.mouse.visible = false;
 
-		if (storyDifficulty == 1)
+		if (storyDifficulty == 2)
 			ClientPrefs.middleScroll = true;
 		else
 			ClientPrefs.middleScroll = false;
@@ -346,7 +348,7 @@ class PlayState extends MusicBeatState
 				case 'thorns':
 					curStage = 'schoolEvil';
 				default:
-					curStage = 'stage';
+					curStage = 'woods';
 			}
 		}
 
@@ -378,10 +380,36 @@ class PlayState extends MusicBeatState
 
 		switch (curStage)
 		{
-			case 'woods':
-				sky = new FlxSprite(0, 0, Paths.image('woods/sky'));
+			case 'woods old':
+				sky = new FlxSprite(0, 0, Paths.image('woods old/sky'));
 				sky.scale.x = 1.5;
 				sky.scale.y = 1.5;
+				sky.scrollFactor.set();
+				sky.antialiasing = ClientPrefs.globalAntialiasing;
+				sky.screenCenter();
+				add(sky);
+
+				woods = new FlxSprite(0, 0, Paths.image('woods old/woods'));
+				woods.antialiasing = ClientPrefs.globalAntialiasing;
+				woods.screenCenter();
+				add(woods);
+
+				/*lightning = new FlxSprite(0, 0);
+				lightning.frames = Paths.getSparrowAtlas('woods/lightning');
+				lightning.animation.addByPrefix('idle', 'null', 1);
+				lightning.animation.addByPrefix('hit', 'strike', 24);
+				lightning.animation.play('idle');
+				lightning.screenCenter();
+				lightning.updateHitbox();*/
+
+				fightMech = new BattleEvents();
+				fightMech.cameras = [camHUD];
+				add(fightMech);
+
+			case 'woods':
+				sky = new FlxSprite(0, 0, Paths.image('woods/sky'));
+				// sky.scale.x = 0.5;
+				// sky.scale.y = 0.5;
 				sky.scrollFactor.set();
 				sky.antialiasing = ClientPrefs.globalAntialiasing;
 				sky.screenCenter();
@@ -762,7 +790,7 @@ class PlayState extends MusicBeatState
 		startCharacterPos(boyfriend);
 		boyfriendGroup.add(boyfriend);
 
-		if (curStage == 'woods') // darkens bf and gf
+		if (curStage == 'woods' || curStage == 'woods old') // darkens bf and gf
 		{
 			var col:Int = 200;
 			boyfriend.color = FlxColor.fromRGB(col,col,col);
@@ -1857,6 +1885,8 @@ class PlayState extends MusicBeatState
 	{
 		heroLightning();
 
+		floatshit += 0.1;
+
 		if(health >= 2)
 			health = 2;
 		if(health <= 0)
@@ -1867,7 +1897,9 @@ class PlayState extends MusicBeatState
 
 		callOnLuas('onUpdate', [elapsed]);
 
-		if (FlxG.keys.justPressed.SPACE && canDodge && !cpuControlled)
+		var dodge = FlxG.keys.justPressed.SPACE || FlxG.keys.justPressed.NUMPADZERO;
+
+		if (dodge && canDodge && !cpuControlled)
 		{
 			canDodge = false;
 			canBeHit = false;
@@ -2096,6 +2128,8 @@ class PlayState extends MusicBeatState
 
 		// FlxG.watch.addQuick('VOL', vocals.amplitudeLeft);
 		// FlxG.watch.addQuick('VOLRight', vocals.amplitudeRight);
+
+		dad.y += Math.sin(floatshit); // hero float;
 
 		iconP1.setGraphicSize(Std.int(FlxMath.lerp(150, iconP1.width, CoolUtil.boundTo(1 - (elapsed * 30), 0, 1))));
 		iconP2.setGraphicSize(Std.int(FlxMath.lerp(150, iconP2.width, CoolUtil.boundTo(1 - (elapsed * 30), 0, 1))));
@@ -2346,7 +2380,7 @@ class PlayState extends MusicBeatState
 						} else {
 							dad.playAnim(animToPlay + altAnim, true);
 							dad.holdTimer = 0;
-							if (health >= 0.021 && canDrain && ClientPrefs.healthDrain)
+							if (health >= 0.021 && canDrain && ClientPrefs.healthDrain && storyDifficulty == 1)
 								health -= 0.02;
 						}
 					}
@@ -2464,7 +2498,7 @@ class PlayState extends MusicBeatState
 
 	var isDead:Bool = false;
 	function doDeathCheck() {
-		if (health <= 0 && !practiceMode && !isDead && !wasTroll && storyDifficulty == 0)
+		if (health <= 0 && !practiceMode && !isDead && !wasTroll && storyDifficulty != 2)
 		{
 			var ret:Dynamic = callOnLuas('onGameOver', []);
 			if(ret != FunkinLua.Function_Stop) {
@@ -2496,7 +2530,7 @@ class PlayState extends MusicBeatState
 				return true;
 			}
 		}
-		else if (health <= 0 && !practiceMode && !isDead && !wasTroll && storyDifficulty == 1)
+		else if (health <= 0 && !practiceMode && !isDead && !wasTroll && storyDifficulty == 2)
 			System.exit(0);
 
 		return false;
@@ -2859,7 +2893,7 @@ class PlayState extends MusicBeatState
 				if (Global.unlocked == true)
 				{
 					var val:Int = Std.parseInt(value1) - 1;
-					if (storyDifficulty == 1 && val <= 3)
+					if (storyDifficulty == 2 && val <= 3)
 						fightMech.callNew(val);
 					else
 						fightMech.callNew(val);
@@ -3848,11 +3882,11 @@ class PlayState extends MusicBeatState
 		if(SONG.song.toLowerCase() == 'danger')
 			camGame.shake(0.004, 0.2);
 
-		if(doRGB) // new gayia
+		if(doRGB) // da gayia
 		{
 			FlxG.camera.zoom += 0.06;
 			camHUD.zoom += 0.04;
-			skyBeat(1.5);
+			skyBeat(20);
 			var shit:Int = lastrgb;
 			shit++;
 			if (shit >= Global.gay.length)
@@ -3861,52 +3895,20 @@ class PlayState extends MusicBeatState
 			sky.color = FlxColor.fromRGB(Global.gay[shit][0], Global.gay[shit][1], Global.gay[shit][2]);
 			woods.color = FlxColor.fromRGB(Global.gay[shit][0] + 100, Global.gay[shit][1] + 100, Global.gay[shit][2] + 100);
 			dad.color = FlxColor.fromRGB(Global.gay[shit][0] + 100, Global.gay[shit][1] + 100, Global.gay[shit][2] + 100);
-			boyfriend.color = FlxColor.fromRGB(Global.gay[shit][0] + 45, Global.gay[shit][1] + 45, Global.gay[shit][2] + 45);
-			gf.color = FlxColor.fromRGB(Global.gay[shit][0] + 45, Global.gay[shit][1] + 45, Global.gay[shit][2] + 45);
+			boyfriend.color = FlxColor.fromRGB(Global.gay[shit][0] + 55, Global.gay[shit][1] + 55, Global.gay[shit][2] + 55);
+			gf.color = FlxColor.fromRGB(Global.gay[shit][0] + 55, Global.gay[shit][1] + 55, Global.gay[shit][2] + 55);
 
 			lastrgb = shit;
 		}
 		else
 		{
-			skyBeat(0.5);
+			skyBeat(2.5);
 			sky.color = FlxColor.WHITE;
 			woods.color = FlxColor.WHITE;
 			dad.color = FlxColor.WHITE;
 			gf.color = FlxColor.fromRGB(200, 200, 200);
 			boyfriend.color = FlxColor.fromRGB(200, 200, 200);
 		}
-
-		// old gayia
-		/*FlxG.camera.zoom += 0.06;
-		camHUD.zoom += 0.04;
-		skyBeat(1.5);
-		var shit = FlxG.random.int(1, 3);
-		if (shit == lastrgb)
-			shit = lastrgb + 1;
-		if (shit == 4)
-			shit = 1;
-		switch (shit)
-		{
-			case 1:
-				sky.color = FlxColor.fromRGB(255, 0, 0);
-				woods.color = FlxColor.fromRGB(255, 100, 100);
-				dad.color = FlxColor.fromRGB(255, 100, 100);
-				boyfriend.color = FlxColor.fromRGB(255, 100, 100);
-				gf.color = FlxColor.fromRGB(255, 100, 100);
-			case 2:
-				sky.color = FlxColor.fromRGB(0, 255, 0);
-				woods.color = FlxColor.fromRGB(100, 255, 100);
-				dad.color = FlxColor.fromRGB(100, 255, 100);
-				gf.color = FlxColor.fromRGB(100, 255, 100);
-				boyfriend.color = FlxColor.fromRGB(100, 255, 100);
-			case 3:
-				sky.color = FlxColor.fromRGB(0, 0, 255);
-				woods.color = FlxColor.fromRGB(100, 100, 255);
-				dad.color = FlxColor.fromRGB(100, 100, 255);
-				gf.color = FlxColor.fromRGB(100, 100, 255);
-				boyfriend.color = FlxColor.fromRGB(100, 100, 255);
-		}
-		lastrgb = shit;*/
 
 		if (generatedMusic)
 		{
@@ -4170,9 +4172,9 @@ class PlayState extends MusicBeatState
 	{
 		if (ClientPrefs.flashing)
 		{
-			sky.scale.x = 1.5 + (0.1 * modifier);
-			sky.scale.y = 1.5 + (0.1 * modifier);
-			FlxTween.tween(sky.scale, {y: 1.5, x: 1.5}, 0.1);
+			sky.scale.x = 1 + (0.01 * modifier);
+			sky.scale.y = 1 + (0.01 * modifier);
+			FlxTween.tween(sky.scale, {y: 1, x: 1}, 0.1);
 		}
 	}
 

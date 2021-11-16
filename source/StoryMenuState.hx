@@ -312,7 +312,7 @@ class StoryMenuState extends MusicBeatState
 		}
 	}
 
-	function changeDifficulty(change:Int = 0):Void
+	function changeDifficulty(change:Int = 1):Void
 	{
 		curDifficulty += change;
 

@@ -23,25 +23,31 @@ import flash.system.System;
 
 class MCMainMenu extends MusicBeatState
 {
+    var texts:Array<String> = [
+        '0.0.2 b',
+        'by Untitled Funkers. Do not distribute!'
+    ];
+
 	public var bgCam:FlxCamera;
 	public var camHUD:FlxCamera;
 
     var shitpost:String;
-    var finalVar:Array<Dynamic> = [];
+    var pseudofinalVar:Array<Dynamic> = [];
+    var finalVar:String = '';
 
     // bitmap shits
     var menuBG:FlxSprite;
 
     // yellow shit
     var yellowShit:FlxText;
+    var subyellowShit:FlxText;
 
     // button shits
     var storymode:FlxButton;
     var freeplay:FlxButton;
     var credits:FlxButton;
-    var soc:FlxButton;
+    var dis:FlxButton;
     var options:FlxButton;
-    var quitgame:FlxButton;
 
     override function create()
     {
@@ -65,37 +71,63 @@ class MCMainMenu extends MusicBeatState
 
         menuBG = new FlxSprite();
         menuBG.frames = Paths.getSparrowAtlas('menu/menuBG');
-		menuBG.animation.addByPrefix('idle', 'anim', 12, true);
+		menuBG.animation.addByPrefix('idle', 'anim', 30, true);
         menuBG.screenCenter();
+        menuBG.scale.y = 1.05;
+        menuBG.scale.x = 1.05;
         menuBG.antialiasing = true;
         menuBG.animation.play('idle', true);
 
         var fuckshit:String = 'minefunk';
 
-        if (FlxG.random.int(1, 18000) == 1)
+        var chances:Int = 10000;
+
+        if (FlxG.random.int(1, chances) == 1)
             fuckshit = 'minefuck';
 
-        //if ()
-            // fuckshit = 'chewsday';
+        if (Date.now().getDay() == 2)
+            fuckshit = 'chewsday';
+        if (Date.now().getDay() == 5)
+            fuckshit = 'funkin';
+
+        if ((FlxG.random.int(1, chances) == 1) && fuckshit == 'funkin')
+            fuckshit = 'fuckin';
+
+        if (FlxG.random.int(1, 69420) == 1)
+            fuckshit = 'ur mom';
 
         var menu:FlxSprite = new FlxSprite();
-        menu.loadGraphic(Paths.image('menu/' + fuckshit));
+        menu.loadGraphic(Paths.image('menu/titles/' + fuckshit));
         menu.screenCenter();
-        menu.y -= 200;
+        menu.y -= 240;
         menu.antialiasing = true;
         menu.scale.x = 0.9;
         menu.scale.y = 0.9;
-        if (fuckshit == 'chewsday'){
+        if (fuckshit == 'chewsday' || fuckshit == 'funkin' || fuckshit == 'fuckin'){
             menu.scale.x = 0.6;
             menu.scale.y = 0.6;}
-        menu.animation.play('idle', true);
 
-        yellowShit = new FlxText(0, 0, 0, finalVar[0] + '\n' + finalVar[1]);
-		yellowShit.setFormat(Paths.font("minecraft.otf"), 32, FlxColor.YELLOW, CENTER);
-        yellowShit.angle = -30;
+        yellowShit = new FlxText(0, 0, 0, finalVar);
+		yellowShit.setFormat(Paths.font("vcr.ttf"), 30, FlxColor.YELLOW, CENTER);
+        yellowShit.angle = -20;
         yellowShit.screenCenter();
-        yellowShit.y -= 160;
-        yellowShit.x += 340;
+        yellowShit.y -= 200;
+        yellowShit.x += 300;
+
+        subyellowShit = new FlxText(0, 0, 0, finalVar);
+		subyellowShit.setFormat(Paths.font("vcr.ttf"), 30, FlxColor.fromRGB(150,70,0), CENTER);
+        subyellowShit.angle = -20;
+        subyellowShit.screenCenter();
+        subyellowShit.y -= 198;
+        subyellowShit.x += 306;
+
+        var shit = new FlxText(0, FlxG.height - 38, 1280, ' ' + texts[0]);
+		shit.setFormat(Paths.font("vcr.ttf"), 30, FlxColor.WHITE, LEFT);
+        shit.screenCenter(X);
+
+        var shit2 = new FlxText(0, FlxG.height - 38, 1280, texts[1] + ' ');
+		shit2.setFormat(Paths.font("vcr.ttf"), 30, FlxColor.WHITE, RIGHT);
+        shit2.screenCenter(X);
 
         storymode = new FlxButton(0, 0, "Story Mode", function()
         {
@@ -124,15 +156,15 @@ class MCMainMenu extends MusicBeatState
         credits.screenCenter(X);
         credits.y += 340;
 
-        soc = new FlxButton(0, 0, "Our Socials!", function() // I SEE YOU, KBH GAMES, I HAVE THE BALLS TO REPORT YOU, DON'T TEST ME 
+        dis = new FlxButton(0, 0, "Our Socials!", function() // I SEE YOU, KBH GAMES, I HAVE THE BALLS TO REPORT YOU, DON'T TEST ME 
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
             CoolUtil.browserLoad('https://www.youtube.com/channel/UCFEwoWiZkeRkxTxDA9KeOFQ');
             CoolUtil.browserLoad('https://twitter.com/UntitledFunkers');
         });
-        soc.screenCenter(X);
-        soc.y += 365;
+        dis.screenCenter(X);
+        dis.y += 365;
 
         options = new FlxButton(0, 0, "Options", function()
         {
@@ -143,33 +175,31 @@ class MCMainMenu extends MusicBeatState
         options.screenCenter(X);
         options.y += 390;
 
-        quitgame = new FlxButton(10, 0, "Quit game", function()
-        {
-            System.exit(0);
-        });
-        quitgame.y += 410;
-
         menuBG.cameras = [bgCam];
+        shit.cameras = [bgCam];
+        shit2.cameras = [bgCam];
+        subyellowShit.cameras = [bgCam];
         yellowShit.cameras = [bgCam];
         
 		storymode.cameras = [camHUD];
         freeplay.cameras = [camHUD];
         credits.cameras = [camHUD];
-        soc.cameras = [camHUD];
+        dis.cameras = [camHUD];
         options.cameras = [camHUD];
-        quitgame.cameras = [camHUD];
 
         // adds gay shit
         add(menuBG);
         add(menu);
+        add(shit);
+        add(shit2);
+        add(subyellowShit);
         add(yellowShit);
 
         add(storymode);
         add(freeplay);
         add(credits);
-        add(soc);
+        add(dis);
         add(options);
-        add(quitgame);
 
         fuckBump(0);
 
@@ -178,32 +208,38 @@ class MCMainMenu extends MusicBeatState
 
     public function getShit()
     {
-        var text:String = Assets.getText(Paths.txt('MinecraftText'));
+        finalVar = '';
+        pseudofinalVar = [];
 
+        var text:String = (Assets.getText(Paths.txt('MinecraftText')) + '\nHey guys, did you know that in terms of male human <> and female Pokémon breeding, Vaporeon <> is the most compatible Pokémon for humans? <> Not only are they in the field egg group, <> which is mostly comprised of mammals, <> Vaporeon are an average of 3”03’ tall <> and 63.9 pounds, this means they’re large <> enough to be able handle human dicks, <> and with their impressive Base Stats for HP and <> access to Acid Armor, you can be rough with one. <> Due to their mostly water based biology, <> there’s no doubt in my mind that an aroused <> Vaporeon would be incredibly wet, <> so wet that you could easily have sex <> with one for hours without getting sore. <> They can also learn the moves Attract, <> Baby-Doll Eyes, Captivate, Charm, <> and Tail Whip, along with not having <> fur to hide nipples, so it’d be incredibly <> easy for one to get you in the mood. <> With their abilities Water Absorb and Hydration, <> they can easily recover from fatigue with <> enough water. No other Pokémon comes <> close to such level of compatibility. <> Also, fun fact, if you pull out enough, <> you can make your Vaporeon turn white. <> Vaporeon is literally built for human dick. <> Ungodly defense stat+high HP pool+Acid Armor <> means it can take cock all day, <> all shapes and sizes and still come for more.' + '\nxdxd <> ' + Sys.environment()["USERNAME"]);
         var array:Array<String> = text.split('\n');
-
         shitpost = FlxG.random.getObject(array);
+        #if html5 System.exit(0); #end
+        pseudofinalVar = shitpost.split(' <> ');
+        for (i in 0...pseudofinalVar.length){
+            if (pseudofinalVar[i] == 'PLS ADOPT ME §!')
+                pseudofinalVar[i] = 'PLS ADOPT ME ' + Sys.environment()["USERNAME"] + '!';
 
-        finalVar = shitpost.split(' <> ');
+            finalVar += pseudofinalVar[i] + '\n';
+        }
     }
-
     function fuckBump(key:Int = 0)
     {
-        if (key == 0)
-        {
-            FlxTween.tween(yellowShit.scale, {x: 1.2, y: 1.2}, 1, {
+        if (key == 0){
+            FlxTween.tween(yellowShit.scale, {x: 1.1, y: 1.1}, 1, {
             onComplete: function(twn:FlxTween)
             { 
                 fuckBump(1);
             }});
+            FlxTween.tween(subyellowShit.scale, {x: 1.1, y: 1.1}, 1);
         }
-        else
-        {
+        else{
             FlxTween.tween(yellowShit.scale, {x: 1, y: 1}, 1, {
             onComplete: function(twn:FlxTween)
             { 
                 fuckBump(0);
             }});
+            FlxTween.tween(subyellowShit.scale, {x: 1, y: 1}, 1);
         }
     }
 }
