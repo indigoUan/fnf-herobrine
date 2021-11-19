@@ -24,6 +24,11 @@ import flash.system.System;
 
 class MCMainMenu extends MusicBeatState
 {
+    var texts:Array<String> = [
+        '0.0.2 b',
+        'by Untitled Funkers. Do not distribute!'
+    ];
+
 	public var bgCam:FlxCamera;
 	public var camHUD:FlxCamera;
 
@@ -105,6 +110,14 @@ class MCMainMenu extends MusicBeatState
         yellowShit.y -= 160;
         yellowShit.x += 340;
 
+        var shit = new FlxText(0, FlxG.height - 38, 1280, ' ' + texts[0]);
+		shit.setFormat(Paths.font("vcr.ttf"), 30, FlxColor.WHITE, LEFT);
+        shit.screenCenter(X);
+
+        var shit2 = new FlxText(0, FlxG.height - 38, 1280, texts[1] + ' ');
+		shit2.setFormat(Paths.font("vcr.ttf"), 30, FlxColor.WHITE, RIGHT);
+        shit2.screenCenter(X);
+
         storymode = new FlxButton(0, 0, "Story Mode", function()
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
@@ -132,10 +145,12 @@ class MCMainMenu extends MusicBeatState
         credits.screenCenter(X);
         credits.y += 340;
 
-        dis = new FlxButton(0, 0, "Discord server", function()
+        dis = new FlxButton(0, 0, "Our Socials!", function() // I SEE YOU, KBH GAMES, I HAVE THE BALLS TO REPORT YOU, DON'T TEST ME 
         {
             FlxG.sound.play(Paths.sound('minecraft_click'), 2);
             CoolUtil.browserLoad('https://discord.gg/m6Rjg78yuS');
+            CoolUtil.browserLoad('https://www.youtube.com/channel/UCFEwoWiZkeRkxTxDA9KeOFQ');
+            CoolUtil.browserLoad('https://twitter.com/UntitledFunkers');
         });
         dis.screenCenter(X);
         dis.y += 365;
