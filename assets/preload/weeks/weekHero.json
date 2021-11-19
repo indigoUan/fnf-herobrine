@@ -1,0 +1,39 @@
+{
+	"storyName": "a...",
+	"hideFreeplay": false,
+	"weekBackground": "woods",
+	"weekBefore": "tutorial",
+	"freeplayColor": [
+		146,
+		113,
+		253
+	],
+	"startUnlocked": true,
+	"songs": [
+		[
+			"recreated",
+			"herobrine",
+			[
+				0,
+				60,
+				80
+			]
+		],
+		[
+			"danger",
+			"herobrine",
+			[
+				0,
+				60,
+				80
+			]
+		]
+	],
+	"hideStoryMode": false,
+	"weekCharacters": [
+		"",
+		"",
+		""
+	],
+	"weekName": "Week 1"
+}
